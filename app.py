@@ -5,9 +5,9 @@ import joblib
 import os
 from datetime import date
 
-# ---------------------------------------------------------
+# =========================================================
 # PAGE SETTINGS
-# ---------------------------------------------------------
+# =========================================================
 
 st.set_page_config(
     page_title="Diabetes Risk Assessment",
@@ -15,20 +15,27 @@ st.set_page_config(
     layout="wide"
 )
 
-# ---------------------------------------------------------
+# =========================================================
 # MODEL FILE PATHS
-# ---------------------------------------------------------
+# =========================================================
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-MODEL_PATH = os.path.join(BASE_DIR, "models", "best_model.pkl")
-SCALER_PATH = os.path.join(BASE_DIR, "models", "scaler.pkl")
-COLUMNS_PATH = os.path.join(BASE_DIR, "models", "feature_columns.pkl")
+MODEL_PATH = os.path.join(
+    BASE_DIR, "models", "best_model.pkl"
+)
 
+SCALER_PATH = os.path.join(
+    BASE_DIR, "models", "scaler.pkl"
+)
 
-# ---------------------------------------------------------
+COLUMNS_PATH = os.path.join(
+    BASE_DIR, "models", "feature_columns.pkl"
+)
+
+# =========================================================
 # LOAD MODEL
-# ---------------------------------------------------------
+# =========================================================
 
 @st.cache_resource
 def load_artifacts():
@@ -41,13 +48,14 @@ def load_artifacts():
 
 
 try:
+
     model, scaler, columns = load_artifacts()
 
 except Exception as e:
 
     st.error("Model files could not be loaded.")
 
-    st.write("Make sure your GitHub repository contains:")
+    st.write("Please make sure these files exist:")
 
     st.code(
         "models/best_model.pkl\n"
@@ -59,45 +67,117 @@ except Exception as e:
 
     st.stop()
 
-
-# ---------------------------------------------------------
-# CUSTOM STYLE
-# ---------------------------------------------------------
+# =========================================================
+# PROFESSIONAL CSS
+# =========================================================
 
 st.markdown(
     """
     <style>
 
+    /* Main page */
+
+    .block-container {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+    }
+
+    /* Main title */
+
     .main-title {
         font-size: 38px;
         font-weight: 700;
+        margin-bottom: 5px;
     }
 
     .subtitle {
         font-size: 17px;
-        color: #666666;
+        color: #777777;
+        margin-bottom: 15px;
     }
+
+    /* Result cards */
 
     .result-box {
-        padding: 25px;
-        border-radius: 15px;
+        padding: 30px;
+        border-radius: 18px;
         text-align: center;
-        margin-top: 20px;
+        margin-top: 10px;
+        min-height: 220px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
     }
+
+    /* Dark green card */
 
     .low-risk {
-        background-color: #eaf7ee;
-        border: 1px solid #b7dfc2;
+        background: linear-gradient(
+            135deg,
+            #10271b,
+            #173d29
+        );
+
+        border: 1px solid #3d8b5b;
+        color: white;
     }
 
+    /* Dark red card */
+
     .high-risk {
-        background-color: #fff0f0;
-        border: 1px solid #e5b5b5;
+        background: linear-gradient(
+            135deg,
+            #2b1215,
+            #471a1f
+        );
+
+        border: 1px solid #a94b55;
+        color: white;
     }
 
     .result-text {
         font-size: 30px;
         font-weight: 700;
+        color: white;
+        margin-bottom: 8px;
+    }
+
+    .result-probability {
+        font-size: 48px;
+        font-weight: 800;
+        color: white;
+        margin: 5px 0 10px 0;
+    }
+
+    .result-description {
+        font-size: 15px;
+        color: #dddddd;
+        line-height: 1.5;
+    }
+
+    /* Sidebar */
+
+    [data-testid="stSidebar"] {
+        border-right: 1px solid #dddddd;
+    }
+
+    /* Section headings */
+
+    .section-heading {
+        font-size: 22px;
+        font-weight: 700;
+        margin-top: 20px;
+        margin-bottom: 15px;
+    }
+
+    /* Footer */
+
+    .footer {
+        text-align: center;
+        color: #777777;
+        font-size: 13px;
+        padding: 15px;
     }
 
     </style>
@@ -105,16 +185,17 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-
-# ---------------------------------------------------------
+# =========================================================
 # SIDEBAR
-# ---------------------------------------------------------
+# =========================================================
 
 with st.sidebar:
 
     st.title("🏥 Diabetes Care")
 
-    st.write("Machine Learning Risk Assessment")
+    st.caption(
+        "Machine Learning Risk Assessment"
+    )
 
     st.divider()
 
@@ -132,8 +213,13 @@ with st.sidebar:
 
     st.success("Model Loaded")
 
-    st.caption("Academic project")
+    st.caption(
+        f"Model: {type(model).__name__}"
+    )
 
+    st.caption(
+        "Academic project"
+    )
 
 # =========================================================
 # RISK ASSESSMENT
@@ -142,7 +228,9 @@ with st.sidebar:
 if page == "🏠 Risk Assessment":
 
     st.markdown(
-        '<div class="main-title">🏥 Diabetes Risk Assessment</div>',
+        '<div class="main-title">'
+        '🏥 Diabetes Risk Assessment'
+        '</div>',
         unsafe_allow_html=True
     )
 
@@ -164,89 +252,105 @@ if page == "🏠 Risk Assessment":
     # PATIENT DETAILS
     # -----------------------------------------------------
 
-    st.subheader("👤 Patient Details")
+    st.markdown(
+        '<div class="section-heading">'
+        '👤 Patient Details'
+        '</div>',
+        unsafe_allow_html=True
+    )
 
-    c1, c2, c3 = st.columns(3)
+    patient_col1, patient_col2, patient_col3 = st.columns(3)
 
-    with c1:
+    with patient_col1:
 
         patient_id = st.text_input(
             "Patient ID",
             placeholder="Example: PT-001"
         )
 
-    with c2:
+    with patient_col2:
 
         assessment_date = st.date_input(
             "Assessment Date",
             value=date.today()
         )
 
-    with c3:
+    with patient_col3:
 
         age = st.number_input(
             "Age",
             min_value=1,
             max_value=120,
-            value=33
+            value=33,
+            step=1
         )
 
     # -----------------------------------------------------
     # CLINICAL MEASUREMENTS
     # -----------------------------------------------------
 
-    st.subheader("🩺 Clinical Measurements")
+    st.markdown(
+        '<div class="section-heading">'
+        '🩺 Clinical Measurements'
+        '</div>',
+        unsafe_allow_html=True
+    )
 
-    c1, c2, c3, c4 = st.columns(4)
+    col1, col2, col3, col4 = st.columns(4)
 
-    with c1:
+    with col1:
 
         pregnancies = st.number_input(
             "Pregnancies",
             min_value=0,
             max_value=20,
-            value=1
+            value=1,
+            step=1
         )
 
-    with c2:
+    with col2:
 
         glucose = st.number_input(
             "Glucose (mg/dL)",
             min_value=0,
             max_value=300,
-            value=120
+            value=120,
+            step=1
         )
 
-    with c3:
+    with col3:
 
         blood_pressure = st.number_input(
             "Blood Pressure (mm Hg)",
             min_value=0,
             max_value=200,
-            value=70
+            value=70,
+            step=1
         )
 
-    with c4:
+    with col4:
 
         skin_thickness = st.number_input(
             "Skin Thickness (mm)",
             min_value=0,
             max_value=100,
-            value=20
+            value=20,
+            step=1
         )
 
-    c1, c2, c3, c4 = st.columns(4)
+    col5, col6, col7, col8 = st.columns(4)
 
-    with c1:
+    with col5:
 
         insulin = st.number_input(
             "Insulin (mu U/mL)",
             min_value=0,
             max_value=900,
-            value=80
+            value=80,
+            step=1
         )
 
-    with c2:
+    with col6:
 
         bmi = st.number_input(
             "BMI",
@@ -256,7 +360,7 @@ if page == "🏠 Risk Assessment":
             step=0.1
         )
 
-    with c3:
+    with col7:
 
         dpf = st.number_input(
             "Diabetes Pedigree Function",
@@ -266,7 +370,7 @@ if page == "🏠 Risk Assessment":
             step=0.01
         )
 
-    with c4:
+    with col8:
 
         st.metric(
             "Model Features",
@@ -276,7 +380,7 @@ if page == "🏠 Risk Assessment":
     st.divider()
 
     # -----------------------------------------------------
-    # PREDICTION BUTTON
+    # PREDICT BUTTON
     # -----------------------------------------------------
 
     predict = st.button(
@@ -284,123 +388,253 @@ if page == "🏠 Risk Assessment":
         use_container_width=True
     )
 
-    # -----------------------------------------------------
+    # =====================================================
     # PREDICTION
-    # -----------------------------------------------------
+    # =====================================================
 
     if predict:
 
         input_data = {
+
             "Pregnancies": pregnancies,
+
             "Glucose": glucose,
+
             "BloodPressure": blood_pressure,
+
             "SkinThickness": skin_thickness,
+
             "Insulin": insulin,
+
             "BMI": bmi,
+
             "DiabetesPedigreeFunction": dpf,
+
             "Age": age
         }
 
         try:
 
+            # Arrange features in training order
+
             input_array = np.array(
-                [[input_data[column] for column in columns]]
+                [
+                    [
+                        input_data[column]
+                        for column in columns
+                    ]
+                ]
             )
 
-            input_scaled = scaler.transform(input_array)
+            # Scale input
 
-            prediction = model.predict(input_scaled)[0]
+            input_scaled = scaler.transform(
+                input_array
+            )
+
+            # Prediction
+
+            prediction = model.predict(
+                input_scaled
+            )[0]
+
+            # Probability
 
             probability = model.predict_proba(
                 input_scaled
             )[0][1]
 
+            # -------------------------------------------------
+            # ASSESSMENT RESULT
+            # -------------------------------------------------
+
             st.divider()
 
-            st.subheader("📊 Assessment Result")
-
-            if prediction == 1:
-
-                st.markdown(
-                    f"""
-                    <div class="result-box high-risk">
-
-                    <div class="result-text">
-                    ⚠️ Higher Predicted Risk
-                    </div>
-
-                    <h2>{probability:.1%}</h2>
-
-                    <p>
-                    Estimated model probability for the
-                    positive diabetes class.
-                    </p>
-
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
-
-            else:
-
-                st.markdown(
-                    f"""
-                    <div class="result-box low-risk">
-
-                    <div class="result-text">
-                    ✅ Lower Predicted Risk
-                    </div>
-
-                    <h2>{probability:.1%}</h2>
-
-                    <p>
-                    Estimated model probability for the
-                    positive diabetes class.
-                    </p>
-
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
-
-            st.progress(
-                float(probability)
+            st.markdown(
+                '<div class="section-heading">'
+                '📊 Assessment Result'
+                '</div>',
+                unsafe_allow_html=True
             )
 
-            st.subheader("📋 Assessment Summary")
+            result_col1, result_col2 = st.columns(
+                [1.6, 1]
+            )
 
-            s1, s2, s3, s4 = st.columns(4)
+            with result_col1:
 
-            with s1:
+                if prediction == 1:
+
+                    st.markdown(
+                        f"""
+                        <div class="result-box high-risk">
+
+                            <div class="result-text">
+                                ⚠️ Higher Predicted Risk
+                            </div>
+
+                            <div class="result-probability">
+                                {probability:.1%}
+                            </div>
+
+                            <div class="result-description">
+                                Estimated model probability for
+                                the positive diabetes class.
+                            </div>
+
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+
+                else:
+
+                    st.markdown(
+                        f"""
+                        <div class="result-box low-risk">
+
+                            <div class="result-text">
+                                ✅ Lower Predicted Risk
+                            </div>
+
+                            <div class="result-probability">
+                                {probability:.1%}
+                            </div>
+
+                            <div class="result-description">
+                                Estimated model probability for
+                                the positive diabetes class.
+                            </div>
+
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+
+            # -------------------------------------------------
+            # PROBABILITY PANEL
+            # -------------------------------------------------
+
+            with result_col2:
+
+                st.subheader("Risk Probability")
+
                 st.metric(
-                    "Patient ID",
-                    patient_id if patient_id else "Not provided"
+                    "Estimated Probability",
+                    f"{probability:.1%}"
                 )
 
-            with s2:
+                st.progress(
+                    float(probability)
+                )
+
+                if probability < 0.30:
+
+                    st.success(
+                        "Lower probability range"
+                    )
+
+                elif probability < 0.70:
+
+                    st.warning(
+                        "Intermediate probability range"
+                    )
+
+                else:
+
+                    st.error(
+                        "Higher probability range"
+                    )
+
+            # -------------------------------------------------
+            # DISCLAIMER
+            # -------------------------------------------------
+
+            st.warning(
+                "⚠️ This result is generated by a machine-learning "
+                "model for academic screening purposes. It is not "
+                "a medical diagnosis and should not replace "
+                "professional clinical evaluation."
+            )
+
+            # -------------------------------------------------
+            # PATIENT SUMMARY
+            # -------------------------------------------------
+
+            st.divider()
+
+            st.markdown(
+                '<div class="section-heading">'
+                '📋 Assessment Summary'
+                '</div>',
+                unsafe_allow_html=True
+            )
+
+            summary1, summary2, summary3, summary4 = st.columns(4)
+
+            with summary1:
+
+                st.metric(
+                    "Patient ID",
+                    patient_id
+                    if patient_id
+                    else "Not provided"
+                )
+
+            with summary2:
+
                 st.metric(
                     "Assessment Date",
                     str(assessment_date)
                 )
 
-            with s3:
+            with summary3:
+
                 st.metric(
                     "Age",
                     f"{age} years"
                 )
 
-            with s4:
+            with summary4:
+
                 st.metric(
                     "BMI",
                     f"{bmi:.1f}"
                 )
 
-            st.warning(
-                "⚠️ This is an academic machine-learning "
-                "prediction and not a medical diagnosis. "
-                "Clinical decisions must be made by qualified "
-                "healthcare professionals."
-            )
+            # -------------------------------------------------
+            # COMPLETE MEASUREMENTS
+            # -------------------------------------------------
+
+            with st.expander(
+                "📋 View Complete Clinical Measurements"
+            ):
+
+                st.table(
+                    {
+                        "Measurement": [
+                            "Pregnancies",
+                            "Glucose",
+                            "Blood Pressure",
+                            "Skin Thickness",
+                            "Insulin",
+                            "BMI",
+                            "Diabetes Pedigree Function",
+                            "Age"
+                        ],
+
+                        "Value": [
+                            pregnancies,
+                            f"{glucose} mg/dL",
+                            f"{blood_pressure} mm Hg",
+                            f"{skin_thickness} mm",
+                            f"{insulin} mu U/mL",
+                            f"{bmi:.1f}",
+                            f"{dpf:.2f}",
+                            f"{age} years"
+                        ]
+                    }
+                )
 
         except Exception as e:
 
@@ -409,7 +643,6 @@ if page == "🏠 Risk Assessment":
             )
 
             st.exception(e)
-
 
 # =========================================================
 # PATIENT INFORMATION
@@ -420,7 +653,8 @@ elif page == "📋 Patient Information":
     st.title("📋 Patient Information")
 
     st.write(
-        "The model uses eight numerical diagnostic features."
+        "The prediction model uses eight numerical "
+        "diagnostic features."
     )
 
     st.table(
@@ -449,7 +683,6 @@ elif page == "📋 Patient Information":
         }
     )
 
-
 # =========================================================
 # MODEL INFORMATION
 # =========================================================
@@ -459,43 +692,53 @@ elif page == "🤖 Model Information":
     st.title("🤖 Model Information")
 
     st.success(
-        f"Loaded model: {type(model).__name__}"
+        f"Loaded Model: {type(model).__name__}"
     )
 
-    st.subheader("Machine Learning Workflow")
+    st.subheader(
+        "Machine Learning Workflow"
+    )
 
     st.code(
         """
-Dataset
-   ↓
+Pima Indians Diabetes Dataset
+            ↓
 Data Cleaning
-   ↓
-Missing / Invalid Value Handling
-   ↓
-Train-Test Split
-   ↓
+            ↓
+Invalid Zero Handling
+            ↓
+Median Imputation
+            ↓
+Train / Test Split
+            ↓
 StandardScaler
-   ↓
+            ↓
 SMOTE
-   ↓
+            ↓
 Model Comparison
-   ↓
-Random Forest Hyperparameter Tuning
-   ↓
+            ↓
+Random Forest Tuning
+            ↓
 Final Model
-   ↓
-Streamlit Prediction
+            ↓
+Joblib Export
+            ↓
+Streamlit Deployment
         """
     )
 
-    st.subheader("Technologies Used")
+    st.subheader(
+        "Technologies Used"
+    )
 
     st.write(
         "Python • Pandas • NumPy • Scikit-learn • "
         "XGBoost • SMOTE • Joblib • Streamlit • Jupyter"
     )
 
-    st.subheader("Saved Model Files")
+    st.subheader(
+        "Saved Model Files"
+    )
 
     st.code(
         """
@@ -506,7 +749,6 @@ models/
         """
     )
 
-
 # =========================================================
 # ABOUT PROJECT
 # =========================================================
@@ -515,14 +757,18 @@ elif page == "📚 About Project":
 
     st.title("📚 About the Project")
 
-    st.subheader("Project Objective")
-
-    st.write(
-        "This project uses machine learning to estimate "
-        "diabetes risk from eight diagnostic measurements."
+    st.subheader(
+        "Project Objective"
     )
 
-    st.subheader("Dataset")
+    st.write(
+        "This project applies machine learning to estimate "
+        "diabetes risk from patient diagnostic measurements."
+    )
+
+    st.subheader(
+        "Dataset"
+    )
 
     st.write(
         "The project uses the Pima Indians Diabetes Dataset "
@@ -530,39 +776,51 @@ elif page == "📚 About Project":
         "features."
     )
 
-    st.subheader("Models Compared")
+    st.subheader(
+        "Models Compared"
+    )
 
     st.write(
         "Logistic Regression, Decision Tree, Random Forest, "
         "KNN, SVM, and XGBoost."
     )
 
-    st.subheader("Final Model")
-
-    st.write(
-        "The project uses a tuned Random Forest model after "
-        "model comparison and hyperparameter tuning."
+    st.subheader(
+        "Final Model"
     )
 
-    st.subheader("⚠️ Medical Disclaimer")
+    st.write(
+        "The final application uses the saved tuned model "
+        "generated during the machine-learning workflow."
+    )
+
+    st.subheader(
+        "⚠️ Medical Disclaimer"
+    )
 
     st.error(
         "This application is an academic machine-learning "
-        "project. It is not a medical device and must not be "
-        "used for diagnosis or treatment. Always consult a "
-        "qualified healthcare professional for medical decisions."
+        "project. It is not a medical device and must not "
+        "be used for diagnosis or treatment. Healthcare "
+        "decisions should be made by qualified professionals."
     )
 
-
-# ---------------------------------------------------------
+# =========================================================
 # FOOTER
-# ---------------------------------------------------------
+# =========================================================
 
 st.divider()
 
-st.caption(
-    "🏥 Diabetes Risk Assessment | "
-    "Academic Machine Learning Project | "
-    "Not for clinical diagnosis"
+st.markdown(
+    """
+    <div class="footer">
+
+    🏥 Diabetes Risk Assessment |
+    Academic Machine Learning Project |
+    Not for Clinical Diagnosis
+
+    </div>
+    """,
+    unsafe_allow_html=True
 )
 
