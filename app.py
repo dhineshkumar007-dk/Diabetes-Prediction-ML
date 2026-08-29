@@ -1,4 +1,4 @@
-```python
+
 import streamlit as st
 import numpy as np
 import joblib
@@ -610,4 +610,3 @@ st.markdown("---")
 st.caption(
     "🩺 Diabetes Risk Predictor | Machine Learning Mini Project"
 )
-```
