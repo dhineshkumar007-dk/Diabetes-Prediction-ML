@@ -171,4 +171,3 @@ if submitted:
         "Probability reflects the model's prediction, "
         "not a clinical diagnosis."
     )
-```
