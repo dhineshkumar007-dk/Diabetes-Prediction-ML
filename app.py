@@ -1,4 +1,4 @@
-```python
+
 import streamlit as st
 import numpy as np
 import joblib
@@ -805,4 +805,3 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-```
